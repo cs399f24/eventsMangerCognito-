@@ -74,8 +74,13 @@
                 if (!response.ok) {
                     throw new Error(`Failed to fetch events: ${response.status} ${response.statusText}`);
                 }
+
                 const data = await response.json();
-                displayEvents(data);
+                // Parse the body string into a usable object
+                const events = JSON.parse(data.body);
+
+                console.log('Parsed Events:', events); // Check the parsed events in the console
+                displayEvents(events);
             } catch (error) {
                 console.error('Error:', error);
                 alert('An error occurred while fetching events. Check the console for details.');
@@ -86,7 +91,6 @@
             const resultsContainer = document.getElementById('results');
             resultsContainer.innerHTML = ''; // Clear existing content
 
-            // Iterate through the events object and display each event
             Object.values(events).forEach(event => {
                 const eventDiv = document.createElement('div');
                 eventDiv.className = 'event';
