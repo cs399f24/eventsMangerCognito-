@@ -86,6 +86,7 @@
             const resultsContainer = document.getElementById('results');
             resultsContainer.innerHTML = ''; // Clear existing content
 
+            // Iterate through the events object and display each event
             Object.values(events).forEach(event => {
                 const eventDiv = document.createElement('div');
                 eventDiv.className = 'event';
