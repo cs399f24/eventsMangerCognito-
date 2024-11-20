@@ -83,43 +83,50 @@
         }
 
         function displayEvents(events) {
-            const resultsContainer = document.getElementById('results');
-            resultsContainer.innerHTML = ''; // Clear existing content
+    const resultsContainer = document.getElementById('results');
+    resultsContainer.innerHTML = ''; // Clear existing content
 
-            Object.values(events).forEach(event => {
-                const eventDiv = document.createElement('div');
-                eventDiv.className = 'event';
+    console.log('Fetched Events:', events); // Log the fetched events to inspect the structure
 
-                const title = document.createElement('div');
-                title.className = 'event-title';
-                title.textContent = event.name;
-                eventDiv.appendChild(title);
+    // Check if the events are in the correct format
+    if (typeof events === 'object' && events !== null) {
+        Object.values(events).forEach(event => {
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'event';
 
-                const date = document.createElement('div');
-                date.className = 'event-detail';
-                date.textContent = `Date: ${event.date}`;
-                eventDiv.appendChild(date);
+            const title = document.createElement('div');
+            title.className = 'event-title';
+            title.textContent = event.name || 'No name available'; // Display default text if name is undefined
+            eventDiv.appendChild(title);
 
-                const location = document.createElement('div');
-                location.className = 'event-detail';
-                location.textContent = `Location: ${event.location}`;
-                eventDiv.appendChild(location);
+            const date = document.createElement('div');
+            date.className = 'event-detail';
+            date.textContent = `Date: ${event.date || 'No date available'}`; // Display default text if date is undefined
+            eventDiv.appendChild(date);
 
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-btn';
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.onclick = () => deleteEvent(event.event_id);
-                eventDiv.appendChild(deleteBtn);
+            const location = document.createElement('div');
+            location.className = 'event-detail';
+            location.textContent = `Location: ${event.location || 'No location available'}`; // Display default text if location is undefined
+            eventDiv.appendChild(location);
 
-                const editBtn = document.createElement('button');
-                editBtn.className = 'edit-btn';
-                editBtn.textContent = 'Edit';
-                editBtn.onclick = () => editEvent(event.event_id, event);
-                eventDiv.appendChild(editBtn);
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.onclick = () => deleteEvent(event.event_id);
+            eventDiv.appendChild(deleteBtn);
 
-                resultsContainer.appendChild(eventDiv);
-            });
-        }
+            const editBtn = document.createElement('button');
+            editBtn.className = 'edit-btn';
+            editBtn.textContent = 'Edit';
+            editBtn.onclick = () => editEvent(event.event_id, event);
+            eventDiv.appendChild(editBtn);
+
+            resultsContainer.appendChild(eventDiv);
+        });
+    } else {
+        resultsContainer.innerHTML = 'No events available.';
+    }
+}
 
         async function addEvent(event) {
             event.preventDefault();
