@@ -66,16 +66,14 @@
         }
     </style>
     <script>
-        const server = 'https://jb0ixpwe23.execute-api.us-east-1.amazonaws.com/dev';  // API endpoint
+        const server = 'https://jb0ixpwe23.execute-api.us-east-1.amazonaws.com/dev';
 
-        // Load events from the server
         async function loadEvents() {
             try {
                 const response = await fetch(server + '/events');
                 if (response.ok) {
-                    const data = await response.json();  // Parse the JSON response
-                    const events = JSON.parse(data.body);  // Parse the stringified body into an actual object
-                    displayEvents(Object.values(events));  // Use Object.values to get the events as an array
+                    const data = await response.json();
+                    displayEvents(data);
                 } else {
                     alert('Failed to fetch events');
                 }
@@ -85,84 +83,84 @@
             }
         }
 
-        // Display events on the page
         function displayEvents(events) {
             const resultsContainer = document.getElementById('results');
             resultsContainer.innerHTML = '';  // Clear existing content
 
-            // Ensure events is an array before iterating
-            if (Array.isArray(events)) {
-                events.forEach(event => {
-                    const eventDiv = document.createElement('div');
-                    eventDiv.className = 'event';
+            // Check if events are returned as an object
+            for (const eventId in events) {
+                const event = events[eventId];
 
-                    const title = document.createElement('div');
-                    title.className = 'event-title';
-                    title.textContent = event.name;
-                    eventDiv.appendChild(title);
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'event';
 
-                    const date = document.createElement('div');
-                    date.className = 'event-detail';
-                    date.textContent = `Date: ${event.date}`;
-                    eventDiv.appendChild(date);
+                const title = document.createElement('div');
+                title.className = 'event-title';
+                title.textContent = event.name;
+                eventDiv.appendChild(title);
 
-                    const location = document.createElement('div');
-                    location.className = 'event-detail';
-                    location.textContent = `Location: ${event.location}`;
-                    eventDiv.appendChild(location);
+                const date = document.createElement('div');
+                date.className = 'event-detail';
+                date.textContent = `Date: ${event.date}`;
+                eventDiv.appendChild(date);
 
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'delete-btn';
-                    deleteBtn.textContent = 'Delete';
-                    deleteBtn.onclick = () => deleteEvent(event.event_id);  // Using event_id for delete operation
-                    eventDiv.appendChild(deleteBtn);
+                const location = document.createElement('div');
+                location.className = 'event-detail';
+                location.textContent = `Location: ${event.location}`;
+                eventDiv.appendChild(location);
 
-                    const editBtn = document.createElement('button');
-                    editBtn.className = 'edit-btn';
-                    editBtn.textContent = 'Edit';
-                    editBtn.onclick = () => editEvent(event.event_id, event);  // Using event_id for edit operation
-                    eventDiv.appendChild(editBtn);
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.onclick = () => deleteEvent(eventId);
+                eventDiv.appendChild(deleteBtn);
 
-                    resultsContainer.appendChild(eventDiv);
-                });
-            } else {
-                resultsContainer.innerHTML = 'No events found.';
+                const editBtn = document.createElement('button');
+                editBtn.className = 'edit-btn';
+                editBtn.textContent = 'Edit';
+                editBtn.onclick = () => editEvent(eventId, event);
+                eventDiv.appendChild(editBtn);
+
+                resultsContainer.appendChild(eventDiv);
             }
         }
 
-        // Add a new event
-     async function addEvent(event) {
-    event.preventDefault();  // Prevent default form submission
-    const name = document.getElementById('name').value;
-    const date = document.getElementById('date').value;
-    const location = document.getElementById('location').value;
+        async function addEvent(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const date = document.getElementById('date').value;
+            const location = document.getElementById('location').value;
 
-    try {
-        const response = await fetch(server + '/add_event', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ name, date, location })  // Send the event data
-        });
+            const eventData = {
+                name,
+                date,
+                location
+            };
 
-        if (response.ok) {
-            const data = await response.json();  // Parse the response from the API
-            alert('Event added successfully!');
-            document.getElementById('eventForm').reset();  // Clear the form fields
-            loadEvents();  // Reload the event list to show the new event
-        } else {
-            const errorData = await response.json();
-            alert(`Failed to add event: ${errorData.message || 'Unknown error'}`);
+            try {
+                const response = await fetch(server + '/add_event', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(eventData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Event added successfully!');
+                    document.getElementById('eventForm').reset();  // Clear the form
+                    loadEvents();  // Reload events to show the new one
+                } else {
+                    alert(`Failed to add event: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while adding the event');
+            }
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while adding the event');
-    }
-}
 
-
-        // Delete an event
         async function deleteEvent(eventId) {
             if (!confirm("Are you sure you want to delete this event?")) return;
 
@@ -183,7 +181,6 @@
             }
         }
 
-        // Edit an event
         async function editEvent(eventId, event) {
             const name = prompt("Edit Event Name:", event.name) || event.name;
             const date = prompt("Edit Event Date:", event.date) || event.date;
@@ -208,7 +205,6 @@
             }
         }
 
-        // Load events when the page loads
         window.onload = loadEvents;
     </script>
 </head>
