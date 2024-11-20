@@ -131,31 +131,36 @@
         }
 
         // Add a new event
-        async function addEvent(event) {
-            event.preventDefault();
-            const name = document.getElementById('name').value;
-            const date = document.getElementById('date').value;
-            const location = document.getElementById('location').value;
+     async function addEvent(event) {
+    event.preventDefault();  // Prevent default form submission
+    const name = document.getElementById('name').value;
+    const date = document.getElementById('date').value;
+    const location = document.getElementById('location').value;
 
-            try {
-                const response = await fetch(server + '/events', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, date, location })
-                });
+    try {
+        const response = await fetch(server + '/events', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name, date, location })  // Send the event data
+        });
 
-                if (response.ok) {
-                    alert('Event added successfully!');
-                    document.getElementById('eventForm').reset();  // Clear the form
-                    loadEvents();  // Reload events to show the new one
-                } else {
-                    alert('Failed to add event');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred while adding the event');
-            }
+        if (response.ok) {
+            const data = await response.json();  // Parse the response from the API
+            alert('Event added successfully!');
+            document.getElementById('eventForm').reset();  // Clear the form fields
+            loadEvents();  // Reload the event list to show the new event
+        } else {
+            const errorData = await response.json();
+            alert(`Failed to add event: ${errorData.message || 'Unknown error'}`);
         }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while adding the event');
+    }
+}
+
 
         // Delete an event
         async function deleteEvent(eventId) {
