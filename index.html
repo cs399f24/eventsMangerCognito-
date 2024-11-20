@@ -74,13 +74,8 @@
                 if (!response.ok) {
                     throw new Error(`Failed to fetch events: ${response.status} ${response.statusText}`);
                 }
-
                 const data = await response.json();
-                // Parse the body string into a usable object
-                const events = JSON.parse(data.body);
-
-                console.log('Loaded Events:', events); // Check the parsed events in the console
-                displayEvents(events);
+                displayEvents(data);
             } catch (error) {
                 console.error('Error:', error);
                 alert('An error occurred while fetching events. Check the console for details.');
@@ -145,6 +140,7 @@
 
                 const addedEvent = await response.json();
                 console.log('Added Event:', addedEvent); // Check the response in the console
+
                 alert('Event added successfully!');
                 document.getElementById('eventForm').reset(); // Clear the form
                 loadEvents(); // Reload events to show the new one
@@ -168,7 +164,7 @@
 
                 console.log('Deleted Event ID:', eventId); // Check the deleted event ID in the console
                 alert('Event deleted successfully!');
-                loadEvents(); // Reload events to reflect changes
+                loadEvents(); // Reload events to reflect changes immediately
             } catch (error) {
                 console.error('Error:', error);
                 alert('An error occurred while deleting the event. Check the console for details.');
@@ -193,8 +189,9 @@
 
                 const updatedEvent = await response.json();
                 console.log('Updated Event:', updatedEvent); // Check the updated event in the console
+
                 alert('Event updated successfully!');
-                loadEvents(); // Reload events to reflect changes
+                loadEvents(); // Reload events to reflect changes immediately
             } catch (error) {
                 console.error('Error:', error);
                 alert('An error occurred while updating the event. Check the console for details.');
