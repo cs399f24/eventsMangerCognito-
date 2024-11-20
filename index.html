@@ -10,9 +10,6 @@
             padding: 20px;
             margin: 0;
         }
-        #results {
-            margin-top: 20px;
-        }
         .event {
             margin-bottom: 20px;
             border: 1px solid #ddd;
@@ -36,14 +33,6 @@
         }
         button.edit-btn {
             background-color: #4CAF50;
-        }
-        #eventForm input {
-            padding: 10px;
-            margin: 5px 0;
-            width: 200px;
-        }
-        #eventForm button {
-            background-color: #008CBA;
         }
     </style>
 </head>
@@ -83,9 +72,6 @@
             const resultsContainer = document.getElementById('results');
             resultsContainer.innerHTML = ''; // Clear existing content
 
-            console.log('Fetched Events:', events); // Log the fetched events to inspect the structure
-
-            // Ensure we are dealing with an array of events
             if (Array.isArray(events)) {
                 if (events.length === 0) {
                     resultsContainer.innerHTML = 'No events available.';
