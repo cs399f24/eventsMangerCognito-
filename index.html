@@ -74,7 +74,7 @@
                 const response = await fetch(server + '/events');
                 if (response.ok) {
                     const data = await response.json();  // Parse the JSON response
-                    const events = JSON.parse(data.body);  // Parse the stringified "body" to get the events
+                    const events = JSON.parse(data.body);  // Parse the stringified body into an actual object
                     displayEvents(Object.values(events));  // Use Object.values to get the events as an array
                 } else {
                     alert('Failed to fetch events');
