@@ -66,12 +66,12 @@
         }
     </style>
     <script>
-        const server = 'https://jb0ixpwe23.execute-api.us-east-1.amazonaws.com/dev'; // Change to your API endpoint
+        const server = 'https://jb0ixpwe23.execute-api.us-east-1.amazonaws.com/dev';  // Updated API endpoint
 
-        // Fetch events from the server
+        // Load events from the server
         async function loadEvents() {
             try {
-                const response = await fetch(server + '/events');
+                const response = await fetch(server + '/events');  // Fetching events from the updated endpoint
                 if (response.ok) {
                     const data = await response.json();
                     displayEvents(data);
@@ -87,59 +87,52 @@
         // Display events on the page
         function displayEvents(events) {
             const resultsContainer = document.getElementById('results');
-            resultsContainer.innerHTML = ''; // Clear existing content
+            resultsContainer.innerHTML = '';  // Clear existing content
 
-            if (Array.isArray(events) && events.length > 0) {
-                events.forEach(event => {
-                    const eventDiv = document.createElement('div');
-                    eventDiv.className = 'event';
+            for (const event of events) {  // Iterating directly over events
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'event';
 
-                    const title = document.createElement('div');
-                    title.className = 'event-title';
-                    title.textContent = event.name;
-                    eventDiv.appendChild(title);
+                const title = document.createElement('div');
+                title.className = 'event-title';
+                title.textContent = event.name;
+                eventDiv.appendChild(title);
 
-                    const date = document.createElement('div');
-                    date.className = 'event-detail';
-                    date.textContent = `Date: ${event.date}`;
-                    eventDiv.appendChild(date);
+                const date = document.createElement('div');
+                date.className = 'event-detail';
+                date.textContent = `Date: ${event.date}`;
+                eventDiv.appendChild(date);
 
-                    const location = document.createElement('div');
-                    location.className = 'event-detail';
-                    location.textContent = `Location: ${event.location}`;
-                    eventDiv.appendChild(location);
+                const location = document.createElement('div');
+                location.className = 'event-detail';
+                location.textContent = `Location: ${event.location}`;
+                eventDiv.appendChild(location);
 
-                    // Delete button
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'delete-btn';
-                    deleteBtn.textContent = 'Delete';
-                    deleteBtn.onclick = () => deleteEvent(event.event_id);
-                    eventDiv.appendChild(deleteBtn);
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.onclick = () => deleteEvent(event.event_id);  // Using event_id for delete operation
+                eventDiv.appendChild(deleteBtn);
 
-                    // Edit button
-                    const editBtn = document.createElement('button');
-                    editBtn.className = 'edit-btn';
-                    editBtn.textContent = 'Edit';
-                    editBtn.onclick = () => editEvent(event.event_id, event);
-                    eventDiv.appendChild(editBtn);
+                const editBtn = document.createElement('button');
+                editBtn.className = 'edit-btn';
+                editBtn.textContent = 'Edit';
+                editBtn.onclick = () => editEvent(event.event_id, event);  // Using event_id for edit operation
+                eventDiv.appendChild(editBtn);
 
-                    resultsContainer.appendChild(eventDiv);
-                });
-            } else {
-                resultsContainer.innerHTML = 'No events found.';
+                resultsContainer.appendChild(eventDiv);
             }
         }
 
         // Add a new event
         async function addEvent(event) {
             event.preventDefault();
-
             const name = document.getElementById('name').value;
             const date = document.getElementById('date').value;
             const location = document.getElementById('location').value;
 
             try {
-                const response = await fetch(server + '/add_event', {
+                const response = await fetch(server + '/events', {  // Using the updated endpoint
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, date, location })
@@ -147,8 +140,8 @@
 
                 if (response.ok) {
                     alert('Event added successfully!');
-                    document.getElementById('eventForm').reset(); // Reset form
-                    loadEvents(); // Reload the events list
+                    document.getElementById('eventForm').reset();  // Clear the form
+                    loadEvents();  // Reload events to show the new one
                 } else {
                     alert('Failed to add event');
                 }
@@ -163,13 +156,13 @@
             if (!confirm("Are you sure you want to delete this event?")) return;
 
             try {
-                const response = await fetch(`${server}/events/${eventId}`, {
+                const response = await fetch(`${server}/events/${eventId}`, {  // Using the updated endpoint
                     method: 'DELETE'
                 });
 
                 if (response.ok) {
                     alert('Event deleted successfully!');
-                    loadEvents(); // Reload the events list
+                    loadEvents();  // Reload events to show the changes
                 } else {
                     alert('Failed to delete event');
                 }
@@ -186,7 +179,7 @@
             const location = prompt("Edit Event Location:", event.location) || event.location;
 
             try {
-                const response = await fetch(`${server}/events/${eventId}`, {
+                const response = await fetch(`${server}/events/${eventId}`, {  // Using the updated endpoint
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, date, location })
@@ -194,7 +187,7 @@
 
                 if (response.ok) {
                     alert('Event updated successfully!');
-                    loadEvents(); // Reload the events list
+                    loadEvents();  // Reload events to show the updated one
                 } else {
                     alert('Failed to update event');
                 }
