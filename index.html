@@ -79,7 +79,7 @@
                 // Parse the body string into a usable object
                 const events = JSON.parse(data.body);
 
-                console.log('Parsed Events:', events); // Check the parsed events in the console
+                console.log('Loaded Events:', events); // Check the parsed events in the console
                 displayEvents(events);
             } catch (error) {
                 console.error('Error:', error);
@@ -143,6 +143,8 @@
                     throw new Error(`Failed to add event: ${response.status} ${response.statusText}`);
                 }
 
+                const addedEvent = await response.json();
+                console.log('Added Event:', addedEvent); // Check the response in the console
                 alert('Event added successfully!');
                 document.getElementById('eventForm').reset(); // Clear the form
                 loadEvents(); // Reload events to show the new one
@@ -164,6 +166,7 @@
                     throw new Error(`Failed to delete event: ${response.status} ${response.statusText}`);
                 }
 
+                console.log('Deleted Event ID:', eventId); // Check the deleted event ID in the console
                 alert('Event deleted successfully!');
                 loadEvents(); // Reload events to reflect changes
             } catch (error) {
@@ -188,6 +191,8 @@
                     throw new Error(`Failed to update event: ${response.status} ${response.statusText}`);
                 }
 
+                const updatedEvent = await response.json();
+                console.log('Updated Event:', updatedEvent); // Check the updated event in the console
                 alert('Event updated successfully!');
                 loadEvents(); // Reload events to reflect changes
             } catch (error) {
