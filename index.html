@@ -138,7 +138,7 @@
     const location = document.getElementById('location').value;
 
     try {
-        const response = await fetch(server + '/events', {
+        const response = await fetch(server + '/add_event', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
