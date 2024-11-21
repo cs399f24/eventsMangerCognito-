@@ -1,65 +1,47 @@
-import boto3
 import json
-from botocore.exceptions import ClientError
-
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('EventsTable')
+import boto3
 
 def lambda_handler(event, context):
-    # Log the event for debugging
-    print("Received event:", json.dumps(event))
-    
-    event_id = event['pathParameters']['event_id']
-    data = json.loads(event['body'])
+    # Parse the body of the request (which is passed as a string)
+    try:
+        body = json.loads(event['body'])  # Parse the stringified JSON body into a Python dictionary
+        event_id = event['pathParameters']['event_id']  # Get the event_id from the path parameters
 
-    # Check if required fields are in the body
-    if 'name' in data and 'date' in data and 'location' in data:
-        try:
-            # Fetch the event to check if it exists
-            response = table.get_item(
-                Key={'event_id': event_id}
-            )
-            if 'Item' not in response:
-                print(f"Event {event_id} not found in the database.")
-                return {
-                    'statusCode': 404,
-                    'body': json.dumps({'error': 'Event not found'}),
-                    'headers': {'Content-Type': 'application/json'}
-                }
+        # Extract the data from the request body
+        name = body['name']
+        date = body['date']
+        location = body['location']
 
-            # Update the event if it exists
-            table.update_item(
-                Key={'event_id': event_id},
-                UpdateExpression="SET #n = :name, #d = :date, #l = :location",
-                ExpressionAttributeNames={
-                    '#n': 'name',
-                    '#d': 'date',
-                    '#l': 'location'
-                },
-                ExpressionAttributeValues={
-                    ':name': data['name'],
-                    ':date': data['date'],
-                    ':location': data['location']
-                },
-                ReturnValues="UPDATED_NEW"
-            )
-            print(f"Event {event_id} updated successfully.")
-            return {
-                'statusCode': 200,
-                'body': json.dumps({'message': 'Event updated successfully'}),
-                'headers': {'Content-Type': 'application/json'}
-            }
+        # Initialize DynamoDB client
+        dynamodb = boto3.resource('dynamodb')
+        table = dynamodb.Table('EventsTable')  # Replace with your DynamoDB table name
 
-        except ClientError as e:
-            print(f"Error updating event: {e}")
-            return {
-                'statusCode': 500,
-                'body': json.dumps({'error': str(e)}),
-                'headers': {'Content-Type': 'application/json'}
-            }
-    else:
+        # Update the item in DynamoDB using the event_id
+        response = table.update_item(
+            Key={'event_id': event_id},  # The primary key of the event to update
+            UpdateExpression="set #name = :name, #date = :date, #location = :location",
+            ExpressionAttributeNames={
+                '#name': 'name', 
+                '#date': 'date', 
+                '#location': 'location'
+            },
+            ExpressionAttributeValues={
+                ':name': name, 
+                ':date': date, 
+                ':location': location
+            },
+            ReturnValues="UPDATED_NEW"  # Returns the updated values
+        )
+
+        # Return a successful response
         return {
-            'statusCode': 400,
-            'body': json.dumps({'error': 'Invalid event data'}),
-            'headers': {'Content-Type': 'application/json'}
+            'statusCode': 200,
+            'body': json.dumps({"message": "Event updated successfully", "updated": response})
+        }
+
+    except Exception as e:
+        # Return an error response in case of issues
+        return {
+            'statusCode': 500,
+            'body': json.dumps({"error": "Internal Server Error", "details": str(e)})
         }
