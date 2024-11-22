@@ -1,2 +1,3 @@
 # eventsManagerCognito-
-![Blank diagram (1)](https://github.com/user-attachments/assets/ec1104b8-f0ff-4cc0-a462-ed82e16b05b9)
+
+![Blank diagram (2)](https://github.com/user-attachments/assets/d4e19019-ceb1-4aae-b1e9-864f70c1faac)
