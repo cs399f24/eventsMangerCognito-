@@ -1,1 +1,1 @@
-# eventsMangerCognito-
+# eventsManagerCognito-
