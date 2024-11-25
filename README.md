@@ -44,7 +44,7 @@ Add the LabRole as the Execution Role in Integration Request
 Add this application/json as the Mapping template in Integration Request
 
 {
-  "body": "$util.escapeJavaScript($input.body)"
+  "body": "$util.escapeJavaScript($input.body)"  
 }
 
 
