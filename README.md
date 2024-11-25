@@ -74,11 +74,11 @@ Add this application/json as the Mapping template in Integration Request
 
 {
 
-    "pathParameters": {
+  "pathParameters": {
     
-        "event_id": "$input.params('event_id')"
+   "event_id": "$input.params('event_id')"
         
-    }
+  }
     
 }
 
@@ -112,7 +112,7 @@ Add this application/json as the Mapping template in Integration Request
   
   "pathParameters": {
   
-    "event_id": "$input.params('event_id')"
+  "event_id": "$input.params('event_id')"
     
   }
   
