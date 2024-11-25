@@ -28,7 +28,9 @@ Add the LabRole as the Execution Role in Integration Request
 Add these Response Headers under Method Respone
 
 Access-Control-Allow-Headers
+
 Access-Control-Allow-Methods
+
 Access-Control-Allow-Origin
 
 Add this Header Mapping 
@@ -42,14 +44,18 @@ Add the LabRole as the Execution Role in Integration Request
 Add this application/json as the Mapping template in Integration Request
 
 {
+
   "body": "$util.escapeJavaScript($input.body)"
+  
 }
 
 
 Add these Response Headers under Method Respone
 
 Access-Control-Allow-Headers
+
 Access-Control-Allow-Methods
+
 Access-Control-Allow-Origin
 
 Add this Header Mapping 
