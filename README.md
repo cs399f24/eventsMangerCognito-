@@ -44,9 +44,7 @@ Add the LabRole as the Execution Role in Integration Request
 Add this application/json as the Mapping template in Integration Request
 
 {
-
   "body": "$util.escapeJavaScript($input.body)"
-  
 }
 
 
@@ -72,15 +70,13 @@ Add the LabRole as the Execution Role in Integration Request
 
 Add this application/json as the Mapping template in Integration Request
 
-{
 
-  "pathParameters": {
-    
-   "event_id": "$input.params('event_id')"
-        
-  }
-    
+{
+    "pathParameters": {
+        "event_id": "$input.params('event_id')"
+    }
 }
+
 
 
 Add these Response Headers under Method Respone
@@ -106,17 +102,6 @@ Add the LabRole as the Execution Role in Integration Request
 
 Add this application/json as the Mapping template in Integration Request
 
-{
-
-  "body": "$util.escapeJavaScript($input.body).replaceAll("\\'", "'")",
-  
-  "pathParameters": {
-  
-  "event_id": "$input.params('event_id')"
-    
-  }
-  
-}
 
 
 Add these Response Headers under Method Respone
