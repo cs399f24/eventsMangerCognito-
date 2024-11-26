@@ -18,7 +18,9 @@ In the add, delete, and update functions, replace the ARN with the ARN of your S
 ## 4. Create the resources
 
 Create an /add_event resource
+
 Create a /events resource
+
 in the /events resource, create an /{event_id} resource
 
 ## 5. Create the GET method in the /events resource 
