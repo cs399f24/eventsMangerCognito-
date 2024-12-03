@@ -1,6 +1,7 @@
 # eventsManagerCognito-
 
-[Blank diagram (1).pdf](https://github.com/user-attachments/files/17985264/Blank.diagram.1.pdf)
+
+![Blank diagram (3)](https://github.com/user-attachments/assets/b7a1305e-fc04-41f8-9aa5-221c550eb6f3)
 
 
 ## Steps
