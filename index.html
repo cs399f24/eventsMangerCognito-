@@ -52,7 +52,7 @@
             font-weight: bold;
             cursor: pointer;
         }
-        .delete-btn {
+        .delete-btn, .edit-btn {
             background-color: #dc3545;
             margin-top: 10px;
             color: white;
@@ -60,18 +60,40 @@
         }
         .edit-btn {
             background-color: #ffc107;
-            margin-top: 10px;
             color: #333;
-            cursor: pointer;
         }
     </style>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.813.0.min.js"></script>
     <script>
         const server = 'https://jb0ixpwe23.execute-api.us-east-1.amazonaws.com/dev';  // API endpoint
+        function parseJwt(token) {
+            var base64Url = token.split('.')[1];
+            var base64 = decodeURIComponent(atob(base64Url).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(base64);
+        };
+
+        function handleAuthResponse() {
+    const hash = window.location.hash.substr(1);  // Extract hash from URL
+    const params = new URLSearchParams(hash);
+    const id_token = params.get('id_token');
+
+    if (id_token) {
+        sessionStorage.setItem('id_token', id_token);  // Store token
+        console.log('Token stored in session storage');
+    } else {
+        console.log('No ID token found in URL fragment.');
+    }
+}
+        function getAuthHeader() {
+            return { 'Authorization': 'Bearer ' + sessionStorage.getItem('id_token') };
+        }
 
         // Load events from the server
         async function loadEvents() {
             try {
-                const response = await fetch(server + '/events');
+                const response = await fetch(server + '/events', { headers: getAuthHeader() });
                 if (response.ok) {
                     const data = await response.json();  // Parse the JSON response
                     const events = JSON.parse(data.body);  // Parse the stringified body into an actual object
@@ -132,96 +154,110 @@
 
         // Add a new event
         async function addEvent(event) {
-    event.preventDefault();
-    const name = document.getElementById('name').value;
-    const date = document.getElementById('date').value;
-    const location = document.getElementById('location').value;
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const date = document.getElementById('date').value;
+            const location = document.getElementById('location').value;
 
-    try {
-        const response = await fetch(server + '/add_event', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ name, date, location })
-        });
+            try {
+                const response = await fetch(server + '/add_event', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        ...getAuthHeader()
+                    },
+                    body: JSON.stringify({ name, date, location })
+                });
 
-        const data = await response.json();  // Capture the API response
-        if (response.ok) {
-            console.log('Event added successfully:', data);
-            alert('Event added successfully!');
-            document.getElementById('eventForm').reset();
-            loadEvents();  // Reload events to check if the event is added
-        } else {
-            console.log('Failed to add event:', data);
-            alert(`Failed to add event: ${data.message || 'Unknown error'}`);
+                const data = await response.json();  // Capture the API response
+                if (response.ok) {
+                    console.log('Event added successfully:', data);
+                    alert('Event added successfully!');
+                    document.getElementById('eventForm').reset();
+                    loadEvents();  // Reload events to check if the event is added
+                } else {
+                    console.log('Failed to add event:', data);
+                    alert(`Failed to add event: ${data.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while adding the event');
+            }
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while adding the event');
-    }
-}
-
 
         // Delete an event
         async function deleteEvent(eventId) {
-    if (!confirm("Are you sure you want to delete this event?")) return;
+            if (!confirm("Are you sure you want to delete this event?")) return;
 
-    try {
-        const response = await fetch(`${server}/events/${eventId}`, {
-            method: 'DELETE'
-        });
+            try {
+                const response = await fetch(`${server}/events/${eventId}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeader()
+                });
 
-        const data = await response.json();
-        if (response.ok) {
-            console.log('Event deleted successfully:', data);
-            alert('Event deleted successfully!');
-            loadEvents();  // Reload events to show the changes
-        } else {
-            console.log('Failed to delete event:', data);
-            alert(`Failed to delete event: ${data.message || 'Unknown error'}`);
+                const data = await response.json();
+                if (response.ok) {
+                    console.log('Event deleted successfully:', data);
+                    alert('Event deleted successfully!');
+                    loadEvents();  // Reload events to show the changes
+                } else {
+                    console.log('Failed to delete event:', data);
+                    alert(`Failed to delete event: ${data.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the event');
+            }
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while deleting the event');
-    }
-}
 
         // Edit an event
         async function editEvent(eventId, event) {
-    const name = prompt("Edit Event Name:", event.name) || event.name;
-    const date = prompt("Edit Event Date:", event.date) || event.date;
-    const location = prompt("Edit Event Location:", event.location) || event.location;
+            const name = prompt("Edit Event Name:", event.name) || event.name;
+            const date = prompt("Edit Event Date:", event.date) || event.date;
+            const location = prompt("Edit Event Location:", event.location) || event.location;
 
-    try {
-        const response = await fetch(`${server}/events/${eventId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, date, location })
-        });
+            try {
+                const response = await fetch(`${server}/events/${eventId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+                    body: JSON.stringify({ name, date, location })
+                });
 
-        const data = await response.json();
-        if (response.ok) {
-            console.log('Event updated successfully:', data);
-            alert('Event updated successfully!');
-            loadEvents();  // Reload events to show the updated one
-        } else {
-            console.log('Failed to update event:', data);
-            alert(`Failed to update event: ${data.message || 'Unknown error'}`);
+                const data = await response.json();
+                if (response.ok) {
+                    console.log('Event updated successfully:', data);
+                    alert('Event updated successfully!');
+                    loadEvents();  // Reload events to show the updated one
+                } else {
+                    console.log('Failed to update event:', data);
+                    alert(`Failed to update event: ${data.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while updating the event');
+            }
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while updating the event');
-    }
-}
 
+        function logout() {
+            sessionStorage.clear(); // Clear the stored tokens
+            window.location.href = 'https://staging.dmamdmkz900da.amplifyapp.com';
+        }
 
         // Load events when the page loads
-        window.onload = loadEvents;
+        window.onload = () => {
+            sessionStorage.setItem('test', '1234');
+            console.log(sessionStorage.getItem('test'));  // Should output '1234'
+            handleAuthResponse();
+            loadEvents();
+        };
     </script>
 </head>
 <body>
     <h1>Events Manager</h1>
+    <button onclick="window.location.href='https://us-east-1in5u9tv3u.auth.us-east-1.amazoncognito.com/login?client_id=2teh4g9bj225vjpbjkjpr7cfrv&redirect_uri=https://staging.dmamdmkz900da.amplifyapp.com&response_type=token&scope=email+openid+phone'">
+      Login
+    </button>
+    <button onclick="logout()">Logout</button>
 
     <div class="form-container">
         <h2>Add New Event</h2>
